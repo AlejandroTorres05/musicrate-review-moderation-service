@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  ml-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ml-content-moderation
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+      - HF_HOME=/app/.cache/huggingface
+    volumes:
+      # Cachear modelos de Hugging Face para no descargarlos cada vez
+      - huggingface-cache:/app/.cache/huggingface
+      # Montar código en desarrollo (comentar en producción)
+      # - ./app:/app/app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # Límites de recursos (ajustar según necesidad)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+volumes:
+  huggingface-cache:
+    driver: local
