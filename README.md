@@ -607,6 +607,7 @@ This service is designed to be deployed on Hugging Face Spaces with Docker.
 The service works **out of the box with default values**, but you can customize behavior via Hugging Face Space Settings > Variables:
 
 **Optional Configuration:**
+
 ```bash
 # Model Thresholds (adjust filtering strictness)
 TOXIC_THRESHOLD=0.7          # Default: 0.7 (range: 0.0-1.0)
@@ -622,18 +623,19 @@ SPAM_MODEL="asfilcnx3/spam-detection-es"                    # Default
 ```
 
 **When to Configure:**
-- ✅ **No configuration needed** for standard usage (defaults work fine)
-- ⚙️ **Set thresholds** only if you need stricter/looser content filtering
-- 🔧 **Adjust batch size** if processing many reviews simultaneously
-- 🔄 **Change models** only if using different Hugging Face models
+
+- **No configuration needed** for standard usage (defaults work fine)
+- **Set thresholds** only if you need stricter/looser content filtering
+- **Adjust batch size** if processing many reviews simultaneously
+- **Change models** only if using different Hugging Face models
 
 ### Hardware Recommendations
 
-| Hardware | Performance | Use Case |
-|----------|-------------|----------|
-| **CPU Basic** | ~1-2s per request | Development, testing, low traffic |
-| **CPU Upgraded** | ~0.5-1s per request | Small to medium production |
-| **GPU (T4)** | ~0.1-0.3s per request | ⭐ **Recommended** for production |
+| Hardware         | Performance           | Use Case                          |
+| ---------------- | --------------------- | --------------------------------- |
+| **CPU Basic**    | ~1-2s per request     | Development, testing, low traffic |
+| **CPU Upgraded** | ~0.5-1s per request   | Small to medium production        |
+| **GPU (T4)**     | ~0.1-0.3s per request | **Recommended** for production    |
 
 **Note:** First request after deployment takes longer (~30-60s) as models download from Hugging Face (~1GB total).
 
