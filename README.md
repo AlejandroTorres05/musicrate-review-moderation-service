@@ -593,23 +593,81 @@ To make the classifier more or less strict:
 
 ## Deployment on Hugging Face Spaces
 
-This service is designed to be deployed on Hugging Face Spaces:
+This service is designed to be deployed on Hugging Face Spaces with Docker.
 
-1. Create a new Space on Hugging Face
-2. Select "Docker" as the SDK
-3. Upload the project files
+### Quick Deployment
+
+1. **Create a new Space** on [Hugging Face Spaces](https://huggingface.co/spaces)
+2. **Select "Docker" as the SDK**
+3. **Upload/Push the project files** to the Space repository
 4. The service will automatically build and deploy
 
-**Environment Variables:**
+### Environment Variables (Optional)
 
-- No special environment variables required
-- Models are automatically downloaded from Hugging Face on first run
+The service works **out of the box with default values**, but you can customize behavior via Hugging Face Space Settings > Variables:
 
-**Hardware Recommendations:**
+**Optional Configuration:**
+```bash
+# Model Thresholds (adjust filtering strictness)
+TOXIC_THRESHOLD=0.7          # Default: 0.7 (range: 0.0-1.0)
+SPAM_THRESHOLD=0.7           # Default: 0.7 (range: 0.0-1.0)
 
-- CPU Basic: Works but slower inference (~1-2s per request)
-- CPU Upgraded: Better performance (~0.5-1s per request)
-- GPU: Recommended for production (~0.1-0.3s per request)
+# Processing Limits
+MAX_BATCH_SIZE=50            # Default: 50
+MAX_TEXT_LENGTH=512          # Default: 512
+
+# ML Models (if you want to use different models)
+TOXICITY_MODEL="bgonzalezbustamante/bert-spanish-toxicity"  # Default
+SPAM_MODEL="asfilcnx3/spam-detection-es"                    # Default
+```
+
+**When to Configure:**
+- ✅ **No configuration needed** for standard usage (defaults work fine)
+- ⚙️ **Set thresholds** only if you need stricter/looser content filtering
+- 🔧 **Adjust batch size** if processing many reviews simultaneously
+- 🔄 **Change models** only if using different Hugging Face models
+
+### Hardware Recommendations
+
+| Hardware | Performance | Use Case |
+|----------|-------------|----------|
+| **CPU Basic** | ~1-2s per request | Development, testing, low traffic |
+| **CPU Upgraded** | ~0.5-1s per request | Small to medium production |
+| **GPU (T4)** | ~0.1-0.3s per request | ⭐ **Recommended** for production |
+
+**Note:** First request after deployment takes longer (~30-60s) as models download from Hugging Face (~1GB total).
+
+### Hugging Face Spaces Setup
+
+Create a `README.md` in your Space root (for Space metadata):
+
+```yaml
+---
+title: Content Moderation ML Service
+emoji: 🛡️
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 8000
+---
+```
+
+### Testing Your Deployment
+
+```bash
+# Replace with your actual Space URL
+SPACE_URL="https://YOUR_USERNAME-YOUR_SPACE_NAME.hf.space"
+
+# Health check
+curl $SPACE_URL/health
+
+# Test classification
+curl -X POST "$SPACE_URL/classify" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Este álbum es increíble"}'
+
+# Interactive docs: $SPACE_URL/docs
+```
 
 ## Performance Considerations
 
